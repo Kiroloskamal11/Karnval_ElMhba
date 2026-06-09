@@ -1,0 +1,12 @@
+package com.church.karneval.enums;
+
+public enum NotificationType {
+    TRANSITION_WARNING,
+    TRANSITION_NOW,
+    NEW_REGISTRATION,
+    REGISTRATION_APPROVED,
+    REGISTRATION_REJECTED,
+    HELP_REQUEST,
+    ARRIVAL_CONFIRMED,
+    NEW_MESSAGE
+}
