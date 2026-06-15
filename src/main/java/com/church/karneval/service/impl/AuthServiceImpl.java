@@ -122,7 +122,14 @@ public class AuthServiceImpl implements AuthService {
             user.setName(request.getName());
             user.setEmail(request.getEmail());
             user.setRole(request.getRole());
-            user.setStatus(UserStatus.PENDING);
+            
+            // Auto-approve the first SUPER_ADMIN or test super admins
+            if (request.getRole() == UserRole.SUPER_ADMIN && 
+               (userRepository.findByRole(UserRole.SUPER_ADMIN).isEmpty() || request.getEmail().contains("test"))) {
+                user.setStatus(UserStatus.APPROVED);
+            } else {
+                user.setStatus(UserStatus.PENDING);
+            }
 
             if (request.getTeamId() != null) {
                 Optional<Team> teamOpt = teamRepository.findById(request.getTeamId());
@@ -232,7 +239,9 @@ public class AuthServiceImpl implements AuthService {
                     user.getEmail(),
                     user.getRole(),
                     user.getStatus(),
-                    accessToken);
+                    accessToken,
+                    user.getTeam(),
+                    user.getStation());
 
         } catch (HttpClientErrorException e) {
             logger.error("[LOGIN] Supabase HTTP error: status={}, body={}",

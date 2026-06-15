@@ -1,6 +1,7 @@
 package com.church.karneval.model;
 
 import com.church.karneval.enums.NotificationType;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import java.time.OffsetDateTime;
 import java.util.UUID;
@@ -15,6 +16,7 @@ public class Notification {
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "user_id", nullable = false)
+    @JsonIgnoreProperties({"approvedBy", "hibernateLazyInitializer", "handler"})
     private User user;
 
     @Column(nullable = false)

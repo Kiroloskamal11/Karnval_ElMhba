@@ -57,6 +57,11 @@ public class ArrivalController {
         return ResponseEntity.ok(arrivalService.getStationArrivals(stationId));
     }
 
+    @GetMapping
+    public ResponseEntity<List<Arrival>> getAllArrivals() {
+        return ResponseEntity.ok(arrivalService.getAllArrivals());
+    }
+
     public static class ConfirmArrivalRequest {
         private UUID teamId;
         private UUID stationId;

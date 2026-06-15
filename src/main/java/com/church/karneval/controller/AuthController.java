@@ -57,4 +57,9 @@ public class AuthController {
             this.password = password;
         }
     }
+
+    @org.springframework.web.bind.annotation.GetMapping("/me")
+    public ResponseEntity<com.church.karneval.model.User> me(@org.springframework.security.core.annotation.AuthenticationPrincipal com.church.karneval.model.User currentUser) {
+        return ResponseEntity.ok(currentUser);
+    }
 }

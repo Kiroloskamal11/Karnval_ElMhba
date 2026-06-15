@@ -25,4 +25,15 @@ public class TestUtil {
         );
         SecurityContextHolder.getContext().setAuthentication(auth);
     }
+
+    public static org.springframework.test.web.servlet.request.RequestPostProcessor securityContextOf(User user) {
+        UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(
+                user,
+                null,
+                java.util.Collections.singletonList(new SimpleGrantedAuthority("ROLE_" + user.getRole().name()))
+        );
+        org.springframework.security.core.context.SecurityContext context = org.springframework.security.core.context.SecurityContextHolder.createEmptyContext();
+        context.setAuthentication(auth);
+        return org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.securityContext(context);
+    }
 }

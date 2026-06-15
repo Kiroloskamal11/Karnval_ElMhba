@@ -2,6 +2,7 @@ package com.church.karneval.model;
 
 import com.church.karneval.enums.UserRole;
 import com.church.karneval.enums.UserStatus;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import java.time.OffsetDateTime;
 import java.util.UUID;
@@ -27,14 +28,17 @@ public class User {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "team_id")
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     private Team team;
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "station_id", unique = true)
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     private Station station;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "approved_by")
+    @JsonIgnoreProperties({"approvedBy", "hibernateLazyInitializer", "handler"})
     private User approvedBy;
 
     @Column(name = "approved_at")

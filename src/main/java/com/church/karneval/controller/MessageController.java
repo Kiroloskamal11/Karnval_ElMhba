@@ -26,8 +26,8 @@ public class MessageController {
     public ResponseEntity<Message> sendMessage(
             @RequestBody SendMessageRequest request,
             @AuthenticationPrincipal User currentUser) {
-        // Broadcast و Group — Admin و Super Admin بس
-        if (request.getRecipientType() != MessageRecipientType.INDIVIDUAL) {
+        // Broadcast و Group — Admin و Super Admin بس (الـ BROADCAST مسموح للجميع لأنه يمثل طلبات دعم عند إرساله من القادة)
+        if (request.getRecipientType() != MessageRecipientType.INDIVIDUAL && request.getRecipientType() != MessageRecipientType.BROADCAST) {
             if (currentUser.getRole() != UserRole.ADMIN &&
                     currentUser.getRole() != UserRole.SUPER_ADMIN) {
                 return ResponseEntity.status(403).build();

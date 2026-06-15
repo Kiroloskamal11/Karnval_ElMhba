@@ -41,6 +41,10 @@ public class SecurityConfig {
                         .requestMatchers("/auth/**").permitAll()
                         .requestMatchers("/health").permitAll()
                         .requestMatchers("/error").permitAll() // ← ضيف
+                        .requestMatchers(org.springframework.http.HttpMethod.GET, "/teams").permitAll()
+                        .requestMatchers(org.springframework.http.HttpMethod.GET, "/teams/**").permitAll()
+                        .requestMatchers(org.springframework.http.HttpMethod.GET, "/stations").permitAll()
+                        .requestMatchers(org.springframework.http.HttpMethod.GET, "/stations/**").permitAll()
                         .anyRequest().authenticated())
                 .addFilterBefore(jwtAuthenticationFilter,
                         UsernamePasswordAuthenticationFilter.class);

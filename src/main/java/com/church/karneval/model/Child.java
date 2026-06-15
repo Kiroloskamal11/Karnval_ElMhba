@@ -1,6 +1,7 @@
 package com.church.karneval.model;
 
 import com.church.karneval.enums.AgeGroup;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import java.time.OffsetDateTime;
 import java.util.UUID;
@@ -15,10 +16,12 @@ public class Child {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "team_id", nullable = false)
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     private Team team;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "added_by", nullable = false)
+    @JsonIgnoreProperties({"approvedBy", "hibernateLazyInitializer", "handler"})
     private User addedBy;
 
     @Column(nullable = false, length = 100)

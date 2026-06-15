@@ -59,10 +59,12 @@ public class MessageServiceImpl implements MessageService {
     @Override
     @Transactional(readOnly = true)
     public List<Message> getUserMessages(UUID userId) {
-        if (!userRepository.existsById(userId)) {
-            throw new RuntimeException("لم يتم العثور على المستخدم بالمعرف: " + userId);
-        }
-        return messageRepository.findUserMessages(userId);
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("لم يتم العثور على المستخدم بالمعرف: " + userId));
+        boolean isTeamLeader = user.getRole() == UserRole.TEAM_LEADER;
+        boolean isCampLeader = user.getRole() == UserRole.CAMP_LEADER;
+        boolean isAdmin = user.getRole() == UserRole.ADMIN || user.getRole() == UserRole.SUPER_ADMIN;
+        return messageRepository.findUserMessages(userId, isTeamLeader, isCampLeader, isAdmin);
     }
 
     @Override

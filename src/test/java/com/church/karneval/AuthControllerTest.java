@@ -11,6 +11,7 @@ import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
@@ -22,7 +23,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
-
+@AutoConfigureMockMvc
 public class AuthControllerTest {
 
         @Autowired
@@ -72,6 +73,8 @@ public class AuthControllerTest {
 
         @Test
         void registerTeamLeader_withoutTeamId_badRequest() throws Exception {
+                Mockito.when(authService.register(any(RegisterRequest.class)))
+                                .thenThrow(new RuntimeException("قائد الفريق يجب أن يختار لون الفريق."));
                 mockMvc.perform(post("/auth/register")
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content("{\"name\":\"Leader\",\"email\":\"leader@example.com\",\"password\":\"Password123\",\"role\":\"TEAM_LEADER\"}"))

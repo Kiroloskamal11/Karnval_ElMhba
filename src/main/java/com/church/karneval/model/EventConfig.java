@@ -1,5 +1,6 @@
 package com.church.karneval.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -40,6 +41,7 @@ public class EventConfig {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "updated_by")
+    @JsonIgnoreProperties({"approvedBy", "hibernateLazyInitializer", "handler"})
     private User updatedBy;
 
     public EventConfig() {

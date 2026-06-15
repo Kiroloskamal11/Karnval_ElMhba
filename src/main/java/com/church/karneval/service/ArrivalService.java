@@ -10,4 +10,5 @@ public interface ArrivalService {
     Arrival updateArrival(UUID arrivalId, UUID confirmedBy);
     List<Arrival> getTeamArrivals(UUID teamId);
     List<Arrival> getStationArrivals(UUID stationId);
+    List<Arrival> getAllArrivals();
 }

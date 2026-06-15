@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.http.MediaType;
@@ -22,7 +23,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @SpringBootTest
-
+@AutoConfigureMockMvc
 public class UserControllerTest {
 
     @Autowired
@@ -47,87 +48,78 @@ public class UserControllerTest {
 
     @Test
     void getAllUsers_superAdmin_ok() throws Exception {
-        TestUtil.setAuthentication(superAdmin);
         when(userService.getAllUsers()).thenReturn(Collections.emptyList());
-        mockMvc.perform(get("/users"))
+        mockMvc.perform(get("/users").with(TestUtil.securityContextOf(superAdmin)))
                 .andExpect(status().isOk());
     }
 
     @Test
     void getAllUsers_admin_forbidden() throws Exception {
-        TestUtil.setAuthentication(admin);
-        mockMvc.perform(get("/users"))
+        mockMvc.perform(get("/users").with(TestUtil.securityContextOf(admin)))
                 .andExpect(status().isForbidden());
     }
 
     @Test
     void getUserById_self_ok() throws Exception {
-        TestUtil.setAuthentication(otherUser);
         when(userService.getUserById(otherUser.getId())).thenReturn(otherUser);
-        mockMvc.perform(get("/users/" + otherUser.getId()))
+        mockMvc.perform(get("/users/" + otherUser.getId()).with(TestUtil.securityContextOf(otherUser)))
                 .andExpect(status().isOk());
     }
 
     @Test
     void getUserById_other_superAdmin_ok() throws Exception {
-        TestUtil.setAuthentication(superAdmin);
         when(userService.getUserById(otherUser.getId())).thenReturn(otherUser);
-        mockMvc.perform(get("/users/" + otherUser.getId()))
+        mockMvc.perform(get("/users/" + otherUser.getId()).with(TestUtil.securityContextOf(superAdmin)))
                 .andExpect(status().isOk());
     }
 
     @Test
     void getUserById_other_notSuperAdmin_forbidden() throws Exception {
-        TestUtil.setAuthentication(admin);
-        mockMvc.perform(get("/users/" + otherUser.getId()))
+        mockMvc.perform(get("/users/" + otherUser.getId()).with(TestUtil.securityContextOf(admin)))
                 .andExpect(status().isForbidden());
     }
 
     @Test
     void approveUser_superAdmin_ok() throws Exception {
-        TestUtil.setAuthentication(superAdmin);
         when(userService.approveUser(any(UUID.class), any(UUID.class))).thenReturn(otherUser);
-        mockMvc.perform(put("/users/" + otherUser.getId() + "/approve"))
+        mockMvc.perform(put("/users/" + otherUser.getId() + "/approve").with(TestUtil.securityContextOf(superAdmin)))
                 .andExpect(status().isOk());
     }
 
     @Test
     void approveUser_admin_forbidden() throws Exception {
-        TestUtil.setAuthentication(admin);
-        mockMvc.perform(put("/users/" + otherUser.getId() + "/approve"))
+        mockMvc.perform(put("/users/" + otherUser.getId() + "/approve").with(TestUtil.securityContextOf(admin)))
                 .andExpect(status().isForbidden());
     }
 
     @Test
     void rejectUser_superAdmin_ok() throws Exception {
-        TestUtil.setAuthentication(superAdmin);
         when(userService.rejectUser(any(UUID.class), any(UUID.class), any(String.class))).thenReturn(otherUser);
         String json = "{\"reason\":\"Not suitable\"}";
         mockMvc.perform(
-                put("/users/" + otherUser.getId() + "/reject").contentType(MediaType.APPLICATION_JSON).content(json))
+                put("/users/" + otherUser.getId() + "/reject").contentType(MediaType.APPLICATION_JSON).content(json)
+                        .with(TestUtil.securityContextOf(superAdmin)))
                 .andExpect(status().isOk());
     }
 
     @Test
     void rejectUser_admin_forbidden() throws Exception {
-        TestUtil.setAuthentication(admin);
         String json = "{\"reason\":\"Not suitable\"}";
         mockMvc.perform(
-                put("/users/" + otherUser.getId() + "/reject").contentType(MediaType.APPLICATION_JSON).content(json))
+                put("/users/" + otherUser.getId() + "/reject").contentType(MediaType.APPLICATION_JSON).content(json)
+                        .with(TestUtil.securityContextOf(admin)))
                 .andExpect(status().isForbidden());
     }
 
     @Test
     void deleteUser_superAdmin_noContent() throws Exception {
-        TestUtil.setAuthentication(superAdmin);
-        mockMvc.perform(delete("/users/" + otherUser.getId()))
+        mockMvc.perform(delete("/users/" + otherUser.getId()).with(TestUtil.securityContextOf(superAdmin)))
                 .andExpect(status().isNoContent());
     }
 
     @Test
     void deleteUser_admin_forbidden() throws Exception {
-        TestUtil.setAuthentication(admin);
-        mockMvc.perform(delete("/users/" + otherUser.getId()))
+        mockMvc.perform(delete("/users/" + otherUser.getId()).with(TestUtil.securityContextOf(admin)))
                 .andExpect(status().isForbidden());
     }
 }

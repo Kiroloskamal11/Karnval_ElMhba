@@ -12,10 +12,18 @@ import java.util.UUID;
 @Repository
 public interface MessageRepository extends JpaRepository<Message, UUID> {
 
-    // ✅ الصح
     @Query("SELECT m FROM Message m WHERE m.sender.id = :userId " +
             "OR m.recipient.id = :userId " +
-            "OR m.recipientType != com.church.karneval.enums.MessageRecipientType.INDIVIDUAL " +
+            "OR (m.recipientType = com.church.karneval.enums.MessageRecipientType.BROADCAST AND " +
+            "    (m.sender.role = com.church.karneval.enums.UserRole.SUPER_ADMIN " +
+            "     OR m.sender.role = com.church.karneval.enums.UserRole.ADMIN " +
+            "     OR :isAdmin = true)) " +
+            "OR (m.recipientType = com.church.karneval.enums.MessageRecipientType.ALL_TEAM_LEADERS AND :isTeamLeader = true) " +
+            "OR (m.recipientType = com.church.karneval.enums.MessageRecipientType.ALL_CAMP_LEADERS AND :isCampLeader = true) " +
             "ORDER BY m.createdAt DESC")
-    List<Message> findUserMessages(@Param("userId") UUID userId);
+    List<Message> findUserMessages(
+            @Param("userId") UUID userId,
+            @Param("isTeamLeader") boolean isTeamLeader,
+            @Param("isCampLeader") boolean isCampLeader,
+            @Param("isAdmin") boolean isAdmin);
 }

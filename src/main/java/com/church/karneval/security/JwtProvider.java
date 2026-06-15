@@ -18,6 +18,7 @@ import java.security.AlgorithmParameters;
 import java.security.spec.ECGenParameterSpec;
 import java.util.Base64;
 import java.util.UUID;
+import javax.crypto.SecretKey;
 
 @Component
 public class JwtProvider {
@@ -25,11 +26,13 @@ public class JwtProvider {
     private static final Logger logger = LoggerFactory.getLogger(JwtProvider.class);
 
     private PublicKey ecPublicKey;
+    private SecretKey hmacKey;
 
     // ✅ الصح — optional مع default value
     @Value("${supabase.jwt.secret:}")
     private String jwtSecret;
 
+    
     // ES256 JWKS coordinates from Supabase
     @Value("${supabase.jwks.x:qZn0NQeaWiYkX13h9-2KpbeRVGX6_73UXBjgkf4gzWA}")
     private String jwksX;
@@ -39,6 +42,16 @@ public class JwtProvider {
 
     @PostConstruct
     public void init() {
+        if (jwtSecret != null && !jwtSecret.isEmpty()) {
+            try {
+                byte[] keyBytes = jwtSecret.getBytes(java.nio.charset.StandardCharsets.UTF_8);
+                this.hmacKey = io.jsonwebtoken.security.Keys.hmacShaKeyFor(keyBytes);
+                logger.info("[JWT] Successfully initialized HS256 secret key from UTF-8 string");
+            } catch (Exception e) {
+                logger.error("[JWT] Failed to initialize HS256 secret key: {}", e.getMessage());
+            }
+        }
+
         try {
             // Decode the x and y coordinates from Base64URL
             byte[] xBytes = Base64.getUrlDecoder().decode(jwksX);
@@ -61,21 +74,34 @@ public class JwtProvider {
             logger.info("[JWT] Successfully initialized ES256 public key for Supabase JWT validation");
         } catch (Exception e) {
             logger.error("[JWT] Failed to initialize ES256 public key: {}", e.getMessage());
-            throw new RuntimeException("Failed to initialize JWT ES256 public key", e);
         }
     }
 
     public Claims validateToken(String token) {
-        try {
-            return Jwts.parser()
-                    .verifyWith(ecPublicKey)
-                    .build()
-                    .parseSignedClaims(token)
-                    .getPayload();
-        } catch (Exception e) {
-            logger.debug("[JWT] Token validation failed: {}", e.getMessage());
-            return null;
+        if (hmacKey != null) {
+            try {
+                return Jwts.parser()
+                        .verifyWith(hmacKey)
+                        .build()
+                        .parseSignedClaims(token)
+                        .getPayload();
+            } catch (Exception e) {
+                logger.warn("[JWT] HS256 token validation failed: {}", e.getMessage());
+            }
         }
+        
+        if (ecPublicKey != null) {
+            try {
+                return Jwts.parser()
+                        .verifyWith(ecPublicKey)
+                        .build()
+                        .parseSignedClaims(token)
+                        .getPayload();
+            } catch (Exception e) {
+                logger.warn("[JWT] ES256 token validation failed: {}", e.getMessage());
+            }
+        }
+        return null;
     }
 
     public UUID getUserIdFromClaims(Claims claims) {

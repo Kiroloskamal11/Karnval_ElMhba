@@ -122,4 +122,10 @@ public class ArrivalServiceImpl implements ArrivalService {
     public List<Arrival> getStationArrivals(UUID stationId) {
         return arrivalRepository.findByStationId(stationId);
     }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<Arrival> getAllArrivals() {
+        return arrivalRepository.findAll();
+    }
 }
