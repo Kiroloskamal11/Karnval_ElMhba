@@ -32,15 +32,21 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     }
 
     @Override
+    protected boolean shouldNotFilter(HttpServletRequest request) {
+        // Skip JWT filter for CORS preflight requests
+        return "OPTIONS".equalsIgnoreCase(request.getMethod());
+    }
+
+    @Override
     protected void doFilterInternal(HttpServletRequest request,
             HttpServletResponse response,
             FilterChain filterChain)
             throws ServletException, IOException {
 
         String authHeader = request.getHeader("Authorization");
-        // السطر بعد تعريف authHeader
         String path = request.getRequestURI();
-        // ✅ الصح
+
+        // Skip JWT validation for public auth endpoints
         if (path.contains("/auth/register") ||
                 path.contains("/auth/login")) {
             filterChain.doFilter(request, response);
