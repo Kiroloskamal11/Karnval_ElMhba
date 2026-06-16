@@ -2,6 +2,7 @@ package com.church.karneval.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
+import org.hibernate.annotations.UuidGenerator;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.OffsetDateTime;
@@ -14,7 +15,7 @@ import jakarta.validation.constraints.Min;
 public class EventConfig {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @UuidGenerator
     private UUID id;
 
     @Column(name = "event_name", nullable = false, length = 100)

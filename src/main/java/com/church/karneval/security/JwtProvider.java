@@ -32,7 +32,6 @@ public class JwtProvider {
     @Value("${supabase.jwt.secret:}")
     private String jwtSecret;
 
-    
     // ES256 JWKS coordinates from Supabase
     @Value("${supabase.jwks.x:qZn0NQeaWiYkX13h9-2KpbeRVGX6_73UXBjgkf4gzWA}")
     private String jwksX;
@@ -89,7 +88,7 @@ public class JwtProvider {
                 logger.warn("[JWT] HS256 token validation failed: {}", e.getMessage());
             }
         }
-        
+
         if (ecPublicKey != null) {
             try {
                 return Jwts.parser()
@@ -106,6 +105,8 @@ public class JwtProvider {
 
     public UUID getUserIdFromClaims(Claims claims) {
         String sub = claims.getSubject();
+        if (sub == null || sub.isBlank())
+            return null; // ← أضف السطر ده
         return UUID.fromString(sub);
     }
 

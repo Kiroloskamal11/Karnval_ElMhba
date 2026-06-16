@@ -56,9 +56,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
             String token = authHeader.substring(7);
             Claims claims = jwtProvider.validateToken(token);
-
             if (claims != null) {
                 UUID userId = jwtProvider.getUserIdFromClaims(claims);
+
+                if (userId == null) { // ← أضف السطرين دول
+                    filterChain.doFilter(request, response);
+                    return;
+                }
 
                 Optional<User> userOpt = userRepository.findById(userId);
                 if (userOpt.isPresent()) {

@@ -1,6 +1,7 @@
 package com.church.karneval.model;
 
 import jakarta.persistence.*;
+import org.hibernate.annotations.UuidGenerator;
 import java.time.OffsetDateTime;
 import java.util.UUID;
 
@@ -9,7 +10,7 @@ import java.util.UUID;
 public class Station {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @UuidGenerator
     private UUID id;
 
     @Column(nullable = false, length = 100)
