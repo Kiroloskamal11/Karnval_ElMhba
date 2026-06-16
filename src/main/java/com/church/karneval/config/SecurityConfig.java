@@ -61,6 +61,7 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOrigins(Arrays.asList(
+                "https://karnaval-elmahaba.netlify.app",
                 "https://wonderful-belekoy-aa677f.netlify.app",
                 "http://localhost:5173",
                 "http://localhost:3000"));
